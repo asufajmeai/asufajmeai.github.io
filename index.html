@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Tycoon</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: #2a2a2a; padding: 20px; border-radius: 15px; border: 2px solid #444; }
+        .shop-item { display: flex; justify-content: space-between; align-items: center; background: #333; margin: 10px 0; padding: 10px; border-radius: 8px; }
+        button { cursor: pointer; padding: 8px 15px; border-radius: 5px; border: none; font-weight: bold; }
+        .buy-btn { background: #4CAF50; color: white; }
+        .buy-btn:disabled { background: #777; }
+        .fight-btn { background: #f44336; color: white; width: 100%; padding: 15px; font-size: 1.2rem; margin-top: 20px; }
+        #status { font-size: 1.2rem; color: #ffd700; margin-bottom: 20px; }
+        #log { font-size: 0.9rem; color: #ccc; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>War Tycoon</h1>
+    <div id="status">Money: $<span id="balance">10</span></div>
+    
+    <div id="shop">
+        </div>
+
+    <button class="fight-btn" onclick="startWar()">GO TO WAR!</button>
+    <div id="log">Your Army: <span id="army-list">Empty</span></div>
+</div>
+
+<script>
+    let money = 10;
+    let armyPower = 0;
+    let myUnits = [];
+
+    const units = [
+        { name: "Scout", cost: 1, power: 10 },
+        { name: "Mercenary", cost: 2, power: 25 },
+        { name: "Shield Maiden", cost: 4, power: 50 },
+        { name: "Assassin", cost: 6, power: 85 },
+        { name: "Paladin", cost: 10, power: 150 }
+    ];
+
+    function renderShop() {
+        const shopDiv = document.getElementById('shop');
+        shopDiv.innerHTML = '';
+        units.forEach(unit => {
+            const div = document.createElement('div');
+            div.className = 'shop-item';
+            div.innerHTML = `
+                <span><strong>${unit.name}</strong> ($${unit.cost}) <br><small>Power: ${unit.power}</small></span>
+                <button class="buy-btn" onclick="buyUnit('${unit.name}', ${unit.cost}, ${unit.power})" ${money < unit.cost ? 'disabled' : ''}>Buy</button>
+            `;
+            shopDiv.appendChild(div);
+        });
+    }
+
+    function buyUnit(name, cost, power) {
+        if (money >= cost) {
+            money -= cost;
+            armyPower += power;
+            myUnits.push(name);
+            document.getElementById('balance').innerText = money;
+            document.getElementById('army-list').innerText = myUnits.join(", ");
+            renderShop();
+        }
+    }
+
+    function startWar() {
+        if (myUnits.length === 0) {
+            alert("You need an army first!");
+            return;
+        }
+        let enemyPower = Math.floor(Math.random() * 80) + 30; // Random enemy between 30-110
+        let message = `Enemy Power: ${enemyPower}\nYour Power: ${armyPower}\n\n`;
+        
+        if (armyPower >= enemyPower) {
+            alert(message + "VICTORY! You won the war!");
+        } else {
+            alert(message + "DEFEAT! Your army was destroyed.");
+        }
+        location.reload(); // Restart game
+    }
+
+    renderShop();
+</script>
+
+</body>
+</html>
